@@ -1,22 +1,29 @@
-import { Prisma, TitleStatus } from "@prisma/client";
+import { PaymentStatus, Prisma, ProtestStatus } from "@prisma/client";
 import { prisma } from "../config/prisma";
 import { AppError } from "../utils/AppError";
 import { buildProtocol } from "../utils/protocol";
 
-type CreateTitle = {
+type CreateProtest = {
   creditorId: string;
   debtorId: string;
+  importBatchId?: string | null;
+  titleNumber?: string;
   amount: number;
-  issueDate: Date;
+  issueDate?: Date;
   dueDate: Date;
+  presentationDate?: Date;
+  paymentStatus?: PaymentStatus;
+  hasBoleto?: boolean;
+  boletoDueDate?: Date | null;
+  boletoAmount?: number | null;
   description?: string;
 };
 
-type TitleFilters = {
+type ProtestFilters = {
   protocol?: string;
   document?: string;
   name?: string;
-  status?: TitleStatus;
+  status?: ProtestStatus;
   date?: Date;
   page: number;
   pageSize: number;
@@ -25,15 +32,59 @@ type TitleFilters = {
 async function nextProtocol() {
   for (let attempt = 0; attempt < 5; attempt += 1) {
     const protocol = buildProtocol();
-    const exists = await prisma.title.findUnique({ where: { protocol } });
+    const exists = await prisma.protest.findUnique({ where: { protocol } });
     if (!exists) return protocol;
   }
   throw new AppError("Nao foi possivel gerar protocolo unico", 500);
 }
 
-export async function listTitles(filters: TitleFilters) {
-  const where: Prisma.TitleWhereInput = {};
-  const and: Prisma.TitleWhereInput[] = [];
+function toProtestData(data: CreateProtest) {
+  return {
+    creditorId: data.creditorId,
+    debtorId: data.debtorId,
+    importBatchId: data.importBatchId,
+    titleNumber: data.titleNumber ?? `MANUAL-${Date.now()}`,
+    amount: data.amount,
+    dueDate: data.dueDate,
+    presentationDate: data.presentationDate ?? data.issueDate ?? new Date(),
+    paymentStatus: data.paymentStatus,
+    hasBoleto: data.hasBoleto,
+    boletoDueDate: data.boletoDueDate,
+    boletoAmount: data.boletoAmount,
+    notes: data.description
+  };
+}
+
+function toProtestUpdateData(data: Partial<CreateProtest>) {
+  return {
+    creditorId: data.creditorId,
+    debtorId: data.debtorId,
+    importBatchId: data.importBatchId,
+    titleNumber: data.titleNumber,
+    amount: data.amount,
+    dueDate: data.dueDate,
+    presentationDate: data.presentationDate ?? data.issueDate,
+    paymentStatus: data.paymentStatus,
+    hasBoleto: data.hasBoleto,
+    boletoDueDate: data.boletoDueDate,
+    boletoAmount: data.boletoAmount,
+    notes: data.description
+  };
+}
+
+function includeRelations() {
+  return {
+    creditor: true,
+    debtor: true,
+    importBatch: true,
+    payments: true,
+    attachments: true
+  };
+}
+
+export async function listTitles(filters: ProtestFilters) {
+  const where: Prisma.ProtestWhereInput = {};
+  const and: Prisma.ProtestWhereInput[] = [];
   if (filters.protocol) where.protocol = { contains: filters.protocol, mode: "insensitive" };
   if (filters.status) where.status = filters.status;
   if (filters.document) and.push({ OR: [{ creditor: { document: { contains: filters.document } } }, { debtor: { document: { contains: filters.document } } }] });
@@ -44,62 +95,100 @@ export async function listTitles(filters: TitleFilters) {
     start.setHours(0, 0, 0, 0);
     const end = new Date(start);
     end.setDate(end.getDate() + 1);
-    where.createdAt = { gte: start, lt: end };
+    where.presentationDate = { gte: start, lt: end };
   }
   const skip = (filters.page - 1) * filters.pageSize;
   const [items, total] = await Promise.all([
-    prisma.title.findMany({ where, include: { creditor: true, debtor: true, createdBy: { select: { id: true, name: true } } }, orderBy: { createdAt: "desc" }, skip, take: filters.pageSize }),
-    prisma.title.count({ where })
+    prisma.protest.findMany({ where, include: includeRelations(), orderBy: { createdAt: "desc" }, skip, take: filters.pageSize }),
+    prisma.protest.count({ where })
   ]);
   return { items, total, page: filters.page, pageSize: filters.pageSize };
 }
 
 export async function getTitle(id: string) {
-  const title = await prisma.title.findUnique({ where: { id }, include: { creditor: true, debtor: true, histories: { include: { user: { select: { name: true } } }, orderBy: { createdAt: "desc" } } } });
-  if (!title) throw new AppError("Titulo nao encontrado", 404);
-  return title;
+  const protest = await prisma.protest.findUnique({
+    where: { id },
+    include: {
+      creditor: true,
+      debtor: true,
+      importBatch: true,
+      attachments: true,
+      payments: true,
+      histories: { include: { user: { select: { name: true } } }, orderBy: { createdAt: "desc" } }
+    }
+  });
+  if (!protest) throw new AppError("Protesto nao encontrado", 404);
+  return protest;
 }
 
-export async function createTitle(data: CreateTitle, userId: string) {
+export async function createTitle(data: CreateProtest, userId: string) {
   const protocol = await nextProtocol();
   return prisma.$transaction(async (tx) => {
-    const title = await tx.title.create({
-      data: { ...data, protocol, createdById: userId },
-      include: { creditor: true, debtor: true }
+    const protest = await tx.protest.create({
+      data: { ...toProtestData(data), protocol, status: ProtestStatus.IMPORTADO },
+      include: includeRelations()
     });
-    await tx.titleHistory.create({ data: { titleId: title.id, userId, field: "status", toStatus: title.status, newValue: title.status, note: "Titulo cadastrado" } });
-    return title;
+    await tx.protestHistory.create({
+      data: {
+        protestId: protest.id,
+        userId,
+        action: "CADASTRO_MANUAL",
+        newValue: protest.status,
+        description: "Protesto cadastrado manualmente no painel."
+      }
+    });
+    return protest;
   });
 }
 
-export async function updateTitle(id: string, data: Partial<CreateTitle>, userId: string) {
-  const previous = await prisma.title.findUnique({ where: { id } });
-  if (!previous) throw new AppError("Titulo nao encontrado", 404);
-  const updated = await prisma.title.update({ where: { id }, data, include: { creditor: true, debtor: true } });
-  await prisma.titleHistory.create({ data: { titleId: id, userId, field: "dados", oldValue: JSON.stringify(previous), newValue: JSON.stringify(data), note: "Titulo atualizado" } });
+export async function updateTitle(id: string, data: Partial<CreateProtest>, userId: string) {
+  const previous = await prisma.protest.findUnique({ where: { id } });
+  if (!previous) throw new AppError("Protesto nao encontrado", 404);
+  const updated = await prisma.protest.update({ where: { id }, data: toProtestUpdateData(data), include: includeRelations() });
+  await prisma.protestHistory.create({
+    data: {
+      protestId: id,
+      userId,
+      action: "ATUALIZACAO_DADOS",
+      oldValue: JSON.stringify(previous),
+      newValue: JSON.stringify(data),
+      description: "Dados importantes do protesto atualizados."
+    }
+  });
   return updated;
 }
 
 export async function deleteTitle(id: string) {
-  return prisma.title.delete({ where: { id } });
+  return prisma.protest.delete({ where: { id } });
 }
 
-export async function changeTitleStatus(id: string, status: TitleStatus, note: string | undefined, userId: string) {
-  const previous = await prisma.title.findUnique({ where: { id } });
-  if (!previous) throw new AppError("Titulo nao encontrado", 404);
-  const updated = await prisma.title.update({ where: { id }, data: { status }, include: { creditor: true, debtor: true } });
-  await prisma.titleHistory.create({ data: { titleId: id, userId, field: "status", fromStatus: previous.status, toStatus: status, oldValue: previous.status, newValue: status, note } });
+export async function changeTitleStatus(id: string, status: ProtestStatus, note: string | undefined, userId: string) {
+  const previous = await prisma.protest.findUnique({ where: { id } });
+  if (!previous) throw new AppError("Protesto nao encontrado", 404);
+  const updated = await prisma.protest.update({ where: { id }, data: { status }, include: includeRelations() });
+  await prisma.protestHistory.create({
+    data: {
+      protestId: id,
+      userId,
+      action: "ALTERACAO_STATUS",
+      oldValue: previous.status,
+      newValue: status,
+      description: note
+    }
+  });
   return updated;
 }
 
 export async function dashboard() {
-  const [totalTitles, totalCreditors, totalDebtors, byStatus, amount, recent] = await Promise.all([
-    prisma.title.count(),
+  const [totalTitles, totalCreditors, totalDebtors, totalBatches, byStatus, byPaymentStatus, amount, recent] = await Promise.all([
+    prisma.protest.count(),
     prisma.creditor.count(),
     prisma.debtor.count(),
-    prisma.title.groupBy({ by: ["status"], _count: { _all: true } }),
-    prisma.title.aggregate({ _sum: { amount: true } }),
-    prisma.title.findMany({ take: 5, orderBy: { createdAt: "desc" }, include: { creditor: true, debtor: true } })
+    prisma.importBatch.count(),
+    prisma.protest.groupBy({ by: ["status"], _count: { _all: true } }),
+    prisma.protest.groupBy({ by: ["paymentStatus"], _count: { _all: true } }),
+    prisma.protest.aggregate({ _sum: { amount: true } }),
+    prisma.protest.findMany({ take: 5, orderBy: { createdAt: "desc" }, include: { creditor: true, debtor: true } })
   ]);
-  return { totalTitles, totalCreditors, totalDebtors, totalAmount: Number(amount._sum.amount ?? 0), byStatus, recent };
+  return { totalTitles, totalProtests: totalTitles, totalCreditors, totalDebtors, totalBatches, totalAmount: Number(amount._sum.amount ?? 0), byStatus, byPaymentStatus, recent };
 }

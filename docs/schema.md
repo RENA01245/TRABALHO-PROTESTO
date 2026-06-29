@@ -2,7 +2,7 @@
 
 ## Visao Geral
 
-O sistema gerencia titulos encaminhados para protesto, credores, devedores, usuarios e historico de alteracoes. O fluxo central e o cadastro de um titulo com protocolo unico, acompanhamento de status e emissao de comprovante.
+O sistema gerencia protestos importados por arquivo, credores, devedores, usuarios, lotes de importacao, erros, anexos, pagamentos e historico de alteracoes. O fluxo central e importar ou registrar um protesto com protocolo unico, acompanhar status, boleto, pagamento e emitir comprovante.
 
 ## Requisitos Funcionais
 
@@ -62,17 +62,26 @@ React, Node.js, TypeScript, PostgreSQL Supabase, API REST, Prisma, JWT, Bcrypt, 
 ## Entidades
 
 - User: usuarios do sistema.
+- ImportBatch: lote de arquivo importado.
+- ImportError: erros encontrados durante a importacao.
 - Creditor: credores.
 - Debtor: devedores.
-- Title: titulos protestados.
-- TitleHistory: historico de alteracoes.
+- Protest: titulo/protesto importado.
+- ProtestAttachment: anexos do protesto, incluindo boleto.
+- ProtestHistory: historico de alteracoes.
+- PaymentInfo: informacoes de pagamento.
 
 ## Atributos
 
 - User: id, name, email, passwordHash, role, active, createdAt, updatedAt.
-- Creditor/Debtor: id, name, document, email, phone, address, city, state, zipCode, createdAt, updatedAt.
-- Title: id, protocol, creditorId, debtorId, amount, dueDate, issueDate, status, description, createdById, createdAt, updatedAt.
-- TitleHistory: id, titleId, userId, fromStatus, toStatus, field, oldValue, newValue, note, createdAt.
+- ImportBatch: id, fileName, fileType, importedById, totalRecords, validRecords, invalidRecords, status, createdAt.
+- ImportError: id, importBatchId, lineNumber, field, message, rawContent, createdAt.
+- Creditor: id, name, document, documentType, createdAt, updatedAt.
+- Debtor: id, name, document, documentType, address, city, state, zipCode, createdAt, updatedAt.
+- Protest: id, protocol, titleNumber, debtorId, creditorId, importBatchId, amount, dueDate, presentationDate, status, paymentStatus, hasBoleto, boletoDueDate, boletoAmount, notes, createdAt, updatedAt.
+- ProtestAttachment: id, protestId, fileName, fileUrl, fileType, attachmentType, uploadedById, createdAt.
+- ProtestHistory: id, protestId, userId, action, oldValue, newValue, description, createdAt.
+- PaymentInfo: id, protestId, amount, paymentDate, paymentMethod, status, notes, createdAt.
 
 ## Regras e Validacoes
 

@@ -2,7 +2,7 @@
 
 ## Arquitetura Completa
 
-O sistema sera dividido em front-end React e back-end Express. O back-end expoe API REST, usa Prisma para persistencia e autentica usuarios com JWT. O PostgreSQL oficial e hospedado no Supabase.
+O sistema sera dividido em front-end React e back-end Express. O back-end expoe API REST, usa Prisma para persistencia e autentica usuarios com JWT. O PostgreSQL oficial e hospedado no Supabase. O banco foi atualizado para monitoramento de protestos importados por arquivo, com lotes, erros, anexos, pagamentos e historico.
 
 ## Camadas
 
@@ -23,6 +23,9 @@ O sistema sera dividido em front-end React e back-end Express. O back-end expoe 
 - `GET/POST/PUT/DELETE /api/titles`
 - `PATCH /api/titles/:id/status`
 - `GET /api/titles/:id/receipt`
+- `GET/POST /api/imports`
+- `POST /api/titles/:id/attachments`
+- `POST /api/titles/:id/payments`
 - `GET /api/dashboard`
 
 ## Banco de Dados

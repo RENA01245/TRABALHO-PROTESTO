@@ -63,17 +63,17 @@
 - Dependencias: T06.
 - Resultado esperado: devedores persistidos.
 
-## T10 Titulos
+## T10 Protestos Importados
 
-- Descricao: CRUD de titulos.
-- Subtarefas: gerar protocolo, validar valor/data, relacionar credor/devedor, filtros.
+- Descricao: CRUD de protestos importados ou cadastrados manualmente.
+- Subtarefas: gerar protocolo, validar valor/data, relacionar credor/devedor, vincular lote de importacao, filtros.
 - Dependencias: T08, T09.
-- Resultado esperado: titulos gerenciados.
+- Resultado esperado: protestos monitorados.
 
-## T11 Status e Historico
+## T11 Status, Pagamento, Boleto e Historico
 
-- Descricao: alterar status e auditar.
-- Subtarefas: endpoint PATCH, registrar usuario, status anterior e novo.
+- Descricao: alterar status, registrar anexos, boletos, pagamentos e auditar.
+- Subtarefas: endpoint PATCH, endpoint de anexos, endpoint de pagamento, registro de usuario e valores alterados.
 - Dependencias: T10.
 - Resultado esperado: trilha de auditoria.
 

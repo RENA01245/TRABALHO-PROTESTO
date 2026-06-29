@@ -16,7 +16,7 @@ export function AppLayout() {
         <strong>Protesto</strong>
         <nav>
           <NavLink to="/">Dashboard</NavLink>
-          <NavLink to="/titulos">Titulos</NavLink>
+          <NavLink to="/titulos">Protestos</NavLink>
           <NavLink to="/credores">Credores</NavLink>
           <NavLink to="/devedores">Devedores</NavLink>
           {user?.role === "ADMIN" && <NavLink to="/usuarios">Usuarios</NavLink>}

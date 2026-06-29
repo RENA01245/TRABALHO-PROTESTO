@@ -6,6 +6,7 @@ export const idParamSchema = z.object({ params: z.object({ id: z.string().uuid()
 export const partyBodySchema = z.object({
   name: z.string().min(2),
   document: z.string().transform(normalizeDocument).refine(isValidCpfOrCnpj, "CPF ou CNPJ invalido"),
+  documentType: z.enum(["CPF", "CNPJ"]).optional(),
   email: z.string().email().optional().or(z.literal("")),
   phone: z.string().optional(),
   address: z.string().optional(),

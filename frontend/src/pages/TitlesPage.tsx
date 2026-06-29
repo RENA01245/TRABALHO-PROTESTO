@@ -16,7 +16,23 @@ type Title = {
   debtor: Party;
 };
 
-const statuses = ["DRAFT", "SUBMITTED", "PROTESTED", "PAID", "CANCELLED"];
+const statuses = [
+  "IMPORTADO",
+  "AGUARDANDO_ANALISE",
+  "ENVIADO_CARTORIO",
+  "INTIMADO",
+  "AGUARDANDO_PAGAMENTO",
+  "PAGO",
+  "PROTESTADO",
+  "SUSTADO",
+  "RETIRADO",
+  "CANCELADO",
+  "DEVOLVIDO",
+  "PENDENTE_BOLETO",
+  "PENDENTE_PAGAMENTO",
+  "PENDENTE_RETORNO",
+  "ERRO_IMPORTACAO"
+];
 
 export function TitlesPage() {
   const [items, setItems] = useState<Title[]>([]);
@@ -70,7 +86,7 @@ export function TitlesPage() {
 
   return (
     <section className="page">
-      <h1>Titulos</h1>
+      <h1>Protestos</h1>
       <div className="toolbar wrap">
         <input placeholder="Protocolo" value={filters.protocol} onChange={(event) => setFilters({ ...filters, protocol: event.target.value })} />
         <input placeholder="CPF/CNPJ" value={filters.document} onChange={(event) => setFilters({ ...filters, document: event.target.value })} />
@@ -88,7 +104,7 @@ export function TitlesPage() {
         <label>Emissao<input type="date" {...register("issueDate")} /></label>
         <label>Vencimento<input type="date" {...register("dueDate")} /></label>
         <label>Descricao<input {...register("description")} /></label>
-        <button>Cadastrar titulo</button>
+        <button>Cadastrar protesto</button>
       </form>
       <DataTable headers={["Protocolo", "Credor", "Devedor", "Valor", "Vencimento", "Status", "Acoes"]}>
         {items.map((item) => (

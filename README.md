@@ -4,7 +4,7 @@ Projeto academico desenvolvido com Spec-Driven Development (SDD) seguindo o flux
 
 ## Objetivo
 
-O sistema simula a operacao de um cartorio de protesto, permitindo autenticar usuarios, gerenciar credores, devedores e titulos, alterar status de protesto, emitir protocolos, gerar comprovantes em PDF e consultar indicadores administrativos.
+O sistema simula a operacao de monitoramento de protestos importados por arquivo, permitindo autenticar usuarios, registrar lotes de importacao, auditar erros de arquivo, gerenciar credores, devedores e protestos, acompanhar pendencias de boleto e pagamento, alterar status, emitir protocolos, gerar comprovantes em PDF e consultar indicadores administrativos.
 
 ## Tecnologias
 
@@ -53,7 +53,8 @@ npm run dev
 4. Copie a connection string direta para `DIRECT_URL`.
 5. Configure as mesmas variaveis no Render.
 6. Execute `npx prisma migrate deploy` no ambiente de deploy ou em uma maquina autorizada.
-7. Execute `npx prisma db seed` para criar o usuario administrador inicial.
+7. Execute `npx prisma db seed` para criar os usuarios iniciais e dados de exemplo.
+8. Se utilizar boletos reais, crie um bucket no Supabase Storage chamado `boletos` e configure `SUPABASE_BUCKET`.
 
 ## Variaveis de Ambiente
 
@@ -65,6 +66,9 @@ DIRECT_URL=
 JWT_SECRET=
 PORT=3333
 CORS_ORIGIN=http://localhost:5173
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+SUPABASE_BUCKET=boletos
 ```
 
 Frontend:
@@ -87,6 +91,8 @@ npx prisma studio
 
 - Email: `admin@protesto.local`
 - Senha: `Admin@123456`
+- Email funcionario: `funcionario@protesto.local`
+- Senha funcionario: `Funcionario@123`
 
 ## Deploy
 
@@ -113,7 +119,7 @@ Supabase:
 
 - Login: adicionar print em `docs/prints/login.png`.
 - Dashboard: adicionar print em `docs/prints/dashboard.png`.
-- Titulos: adicionar print em `docs/prints/titulos.png`.
+- Protestos: adicionar print em `docs/prints/titulos.png`.
 
 ## Commits Sugeridos
 

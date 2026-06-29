@@ -1,7 +1,7 @@
 import PDFDocument from "pdfkit";
-import { Title, Creditor, Debtor } from "@prisma/client";
+import { Creditor, Debtor, Protest } from "@prisma/client";
 
-type ReceiptTitle = Title & { creditor: Creditor; debtor: Debtor };
+type ReceiptTitle = Protest & { creditor: Creditor; debtor: Debtor };
 
 export function createReceiptPdf(title: ReceiptTitle) {
   const doc = new PDFDocument({ margin: 48 });
@@ -13,7 +13,7 @@ export function createReceiptPdf(title: ReceiptTitle) {
   doc.fontSize(12).text(`Protocolo: ${title.protocol}`);
   doc.text(`Status: ${title.status}`);
   doc.text(`Valor: R$ ${Number(title.amount).toFixed(2)}`);
-  doc.text(`Emissao: ${title.issueDate.toLocaleDateString("pt-BR")}`);
+  doc.text(`Apresentacao: ${title.presentationDate.toLocaleDateString("pt-BR")}`);
   doc.text(`Vencimento: ${title.dueDate.toLocaleDateString("pt-BR")}`);
   doc.moveDown();
   doc.text(`Credor: ${title.creditor.name}`);
@@ -21,9 +21,9 @@ export function createReceiptPdf(title: ReceiptTitle) {
   doc.moveDown();
   doc.text(`Devedor: ${title.debtor.name}`);
   doc.text(`Documento do devedor: ${title.debtor.document}`);
-  if (title.description) {
+  if (title.notes) {
     doc.moveDown();
-    doc.text(`Descricao: ${title.description}`);
+    doc.text(`Observacoes: ${title.notes}`);
   }
   doc.moveDown();
   doc.text("Documento emitido eletronicamente pelo Sistema de Gerenciamento de Protesto de Titulos.");

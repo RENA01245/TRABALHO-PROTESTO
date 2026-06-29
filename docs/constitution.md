@@ -2,7 +2,7 @@
 
 ## Objetivo do Projeto
 
-Desenvolver um Sistema de Gerenciamento de Protesto de Titulos para uso academico em Engenharia de Software, aplicando Spec-Driven Development e entregando documentacao, front-end, back-end, banco de dados e preparacao para deploy.
+Desenvolver um Sistema de Gerenciamento e Monitoramento de Protestos para uso academico em Engenharia de Software, aplicando Spec-Driven Development e entregando documentacao, front-end, back-end, banco de dados e preparacao para deploy. O foco atualizado do banco e a importacao de arquivos, monitoramento de protestos, boletos, pagamentos, pendencias e historico.
 
 ## Tecnologias Utilizadas
 
@@ -89,3 +89,7 @@ O projeto deve ser mantido em GitHub com branch principal protegida e commits pe
 - Controle de acesso por perfil.
 - Auditoria de alteracoes.
 - Configuracao sensivel via variaveis de ambiente.
+
+## Atualizacao de Escopo do Banco
+
+O modelo oficial passa a contemplar `ImportBatch`, `ImportError`, `Protest`, `ProtestAttachment`, `ProtestHistory` e `PaymentInfo`, mantendo `User`, `Creditor` e `Debtor`. O sistema deve priorizar protestos importados por arquivo e o acompanhamento de status, boleto, pagamento, pendencias e retorno operacional.
