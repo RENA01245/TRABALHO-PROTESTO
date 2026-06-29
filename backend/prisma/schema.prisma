@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+}
+
+enum TitleStatus {
+  DRAFT
+  SUBMITTED
+  PROTESTED
+  PAID
+  CANCELLED
+}
+
+model User {
+  id           String         @id @default(uuid())
+  name         String
+  email        String         @unique
+  passwordHash String
+  role         Role           @default(EMPLOYEE)
+  active       Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  titles       Title[]        @relation("CreatedTitles")
+  histories    TitleHistory[]
+
+  @@index([role])
+}
+
+model Creditor {
+  id        String   @id @default(uuid())
+  name      String
+  document  String   @unique
+  email     String?
+  phone     String?
+  address   String?
+  city      String?
+  state     String?
+  zipCode   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  titles    Title[]
+
+  @@index([name])
+  @@index([document])
+}
+
+model Debtor {
+  id        String   @id @default(uuid())
+  name      String
+  document  String   @unique
+  email     String?
+  phone     String?
+  address   String?
+  city      String?
+  state     String?
+  zipCode   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  titles    Title[]
+
+  @@index([name])
+  @@index([document])
+}
+
+model Title {
+  id          String         @id @default(uuid())
+  protocol    String         @unique
+  creditorId  String
+  debtorId    String
+  amount      Decimal        @db.Decimal(12, 2)
+  issueDate   DateTime
+  dueDate     DateTime
+  status      TitleStatus    @default(SUBMITTED)
+  description String?
+  createdById String
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  creditor    Creditor       @relation(fields: [creditorId], references: [id], onDelete: Restrict)
+  debtor      Debtor         @relation(fields: [debtorId], references: [id], onDelete: Restrict)
+  createdBy   User           @relation("CreatedTitles", fields: [createdById], references: [id], onDelete: Restrict)
+  histories   TitleHistory[]
+
+  @@index([protocol])
+  @@index([status])
+  @@index([dueDate])
+  @@index([creditorId])
+  @@index([debtorId])
+}
+
+model TitleHistory {
+  id         String       @id @default(uuid())
+  titleId    String
+  userId     String
+  fromStatus TitleStatus?
+  toStatus   TitleStatus?
+  field      String
+  oldValue   String?
+  newValue   String?
+  note       String?
+  createdAt  DateTime     @default(now())
+  title      Title        @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  user       User         @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([titleId])
+  @@index([userId])
+}

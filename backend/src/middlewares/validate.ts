@@ -1,0 +1,16 @@
+import { NextFunction, Request, Response } from "express";
+import { ZodSchema } from "zod";
+
+export function validate(schema: ZodSchema) {
+  return (request: Request, _response: Response, next: NextFunction) => {
+    const parsed = schema.parse({
+      body: request.body,
+      params: request.params,
+      query: request.query
+    });
+    request.body = parsed.body ?? request.body;
+    request.params = parsed.params ?? request.params;
+    request.query = parsed.query ?? request.query;
+    return next();
+  };
+}
