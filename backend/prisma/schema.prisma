@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  FUNCIONARIO
+}
+
+enum TipoDocumento {
+  CPF
+  CNPJ
+}
+
+enum TituloStatus {
+  PENDENTE
+  EM_ANALISE
+  PROTESTADO
+  CANCELADO
+  RETIRADO
+  PAGO
+}
+
+model Usuario {
+  id                   String               @id @default(uuid())
+  nome                 String
+  email                String               @unique
+  senha                String
+  role                 Role                 @default(FUNCIONARIO)
+  ativo                Boolean              @default(true)
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  historicos           HistoricoTitulo[]
+  passwordResetTokens  PasswordResetToken[]
+
+  @@map("usuarios")
+}
+
+model Credor {
+  id            String        @id @default(uuid())
+  nome          String
+  documento     String        @unique
+  tipoDocumento TipoDocumento
+  email         String?
+  telefone      String?
+  endereco      String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  titulos       Titulo[]
+
+  @@map("credores")
+}
+
+model Devedor {
+  id            String        @id @default(uuid())
+  nome          String
+  documento     String        @unique
+  tipoDocumento TipoDocumento
+  email         String?
+  telefone      String?
+  endereco      String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  titulos       Titulo[]
+
+  @@map("devedores")
+}
+
+model Titulo {
+  id              String         @id @default(uuid())
+  protocolo       String         @unique
+  credorId        String
+  devedorId       String
+  valor           Decimal        @db.Decimal(15, 2)
+  dataVencimento  DateTime
+  dataProtesto    DateTime?
+  tipoTitulo      String
+  status          TituloStatus   @default(PENDENTE)
+  observacoes     String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  credor          Credor         @relation(fields: [credorId], references: [id])
+  devedor         Devedor        @relation(fields: [devedorId], references: [id])
+  historicos      HistoricoTitulo[]
+
+  @@map("titulos")
+}
+
+model HistoricoTitulo {
+  id            String   @id @default(uuid())
+  tituloId      String
+  usuarioId     String
+  acao          String
+  campo         String?
+  valorAnterior String?
+  valorNovo     String?
+  createdAt     DateTime @default(now())
+  titulo        Titulo   @relation(fields: [tituloId], references: [id], onDelete: Cascade)
+  usuario       Usuario  @relation(fields: [usuarioId], references: [id])
+
+  @@map("historico_titulos")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  usuarioId String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
+}
