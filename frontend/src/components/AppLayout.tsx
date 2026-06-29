@@ -15,11 +15,12 @@ export function AppLayout() {
       <aside className="sidebar">
         <strong>Protesto</strong>
         <nav>
-          <NavLink to="/">Dashboard</NavLink>
-          <NavLink to="/titulos">Protestos</NavLink>
-          <NavLink to="/credores">Credores</NavLink>
-          <NavLink to="/devedores">Devedores</NavLink>
+          <NavLink to="/dashboard">Dashboard</NavLink>
+          <NavLink to="/protestos">Protestos</NavLink>
+          <NavLink to="/importar">Importar Arquivo</NavLink>
           {user?.role === "ADMIN" && <NavLink to="/usuarios">Usuarios</NavLink>}
+          <NavLink to="/relatorios">Relatorios</NavLink>
+          <button className="navButton" onClick={handleLogout}>Sair</button>
         </nav>
       </aside>
       <main>

@@ -83,6 +83,18 @@ React, Node.js, TypeScript, PostgreSQL Supabase, API REST, Prisma, JWT, Bcrypt, 
 - ProtestHistory: id, protestId, userId, action, oldValue, newValue, description, createdAt.
 - PaymentInfo: id, protestId, amount, paymentDate, paymentMethod, status, notes, createdAt.
 
+## Importacao CSV
+
+Cabecalho esperado:
+
+```csv
+protocolo,numero_titulo,nome_devedor,documento_devedor,tipo_documento_devedor,nome_credor,documento_credor,tipo_documento_credor,valor,data_vencimento,data_apresentacao,status
+```
+
+Campos importados: protocolo, numero do titulo, devedor, documento do devedor, tipo de documento, credor, documento do credor, valor, vencimento, apresentacao e status. Registros invalidos sao preservados como `ImportError`.
+
+Layout SIMPROT/CRA: (A DEFINIR).
+
 ## Regras e Validacoes
 
 - Protocolo unico.

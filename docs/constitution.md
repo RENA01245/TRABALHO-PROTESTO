@@ -93,3 +93,7 @@ O projeto deve ser mantido em GitHub com branch principal protegida e commits pe
 ## Atualizacao de Escopo do Banco
 
 O modelo oficial passa a contemplar `ImportBatch`, `ImportError`, `Protest`, `ProtestAttachment`, `ProtestHistory` e `PaymentInfo`, mantendo `User`, `Creditor` e `Debtor`. O sistema deve priorizar protestos importados por arquivo e o acompanhamento de status, boleto, pagamento, pendencias e retorno operacional.
+
+## Interface e Verificacao
+
+A interface deve expor rotas protegidas para dashboard, protestos, detalhes, importacao de arquivo, usuarios e relatorios. O layout deve manter padrao administrativo, com menu lateral, cabecalho, cards, tabelas, badges de status, mensagens de erro/sucesso e loading em operacoes de dados.

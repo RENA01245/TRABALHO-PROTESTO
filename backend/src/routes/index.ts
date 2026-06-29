@@ -8,6 +8,7 @@ import { protestExtraController } from "../controllers/protestExtraController";
 import { titleController } from "../controllers/titleController";
 import { userController } from "../controllers/userController";
 import { authenticate, authorize } from "../middlewares/auth";
+import { upload } from "../middlewares/upload";
 import { validate } from "../middlewares/validate";
 import { asyncHandler } from "../utils/asyncHandler";
 import { openApiDocument } from "../docs/openapi";
@@ -34,7 +35,8 @@ routes.use(auth);
 routes.get("/dashboard", ah(titleController.dashboard));
 
 routes.get("/imports", ah(importController.list));
-routes.post("/imports", validate(createImportBatchSchema), ah(importController.create));
+routes.post("/imports", upload.single("file"), ah(importController.upload));
+routes.post("/imports/manual", validate(createImportBatchSchema), ah(importController.create));
 
 routes.get("/users", authorize(UserRole.ADMIN), ah(userController.list));
 routes.post("/users", authorize(UserRole.ADMIN), validate(createUserSchema), ah(userController.create));
@@ -58,5 +60,5 @@ routes.put("/titles/:id", validate(updateTitleSchema), ah(titleController.update
 routes.delete("/titles/:id", authorize(UserRole.ADMIN), validate(idParamSchema), ah(titleController.delete));
 routes.patch("/titles/:id/status", validate(statusSchema), ah(titleController.changeStatus));
 routes.get("/titles/:id/receipt", validate(idParamSchema), ah(titleController.receipt));
-routes.post("/titles/:id/attachments", validate(attachmentSchema), ah(protestExtraController.addAttachment));
+routes.post("/titles/:id/attachments", upload.single("file"), validate(attachmentSchema), ah(protestExtraController.addAttachment));
 routes.post("/titles/:id/payments", validate(paymentSchema), ah(protestExtraController.addPayment));

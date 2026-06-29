@@ -25,6 +25,8 @@ type ProtestFilters = {
   name?: string;
   status?: ProtestStatus;
   date?: Date;
+  startDate?: Date;
+  endDate?: Date;
   page: number;
   pageSize: number;
 };
@@ -96,6 +98,12 @@ export async function listTitles(filters: ProtestFilters) {
     const end = new Date(start);
     end.setDate(end.getDate() + 1);
     where.presentationDate = { gte: start, lt: end };
+  }
+  if (filters.startDate || filters.endDate) {
+    where.presentationDate = {
+      gte: filters.startDate,
+      lte: filters.endDate
+    };
   }
   const skip = (filters.page - 1) * filters.pageSize;
   const [items, total] = await Promise.all([

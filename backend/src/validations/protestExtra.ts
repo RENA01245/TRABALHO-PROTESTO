@@ -6,10 +6,13 @@ const paymentStatuses = ["PENDENTE", "INFORMADO", "CONFIRMADO", "CANCELADO"] as 
 export const attachmentSchema = z.object({
   params: z.object({ id: z.string().uuid() }),
   body: z.object({
-    fileName: z.string().min(1),
-    fileUrl: z.string().url(),
-    fileType: z.string().min(1),
-    attachmentType: z.enum(attachmentTypes).default("OUTRO")
+    fileName: z.string().min(1).optional(),
+    fileUrl: z.string().url().optional(),
+    fileType: z.string().min(1).optional(),
+    attachmentType: z.enum(attachmentTypes).default("OUTRO"),
+    boletoDueDate: z.coerce.date().optional(),
+    boletoAmount: z.coerce.number().positive().optional(),
+    notes: z.string().optional()
   })
 });
 

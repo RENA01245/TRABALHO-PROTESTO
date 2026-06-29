@@ -28,6 +28,12 @@ O sistema sera dividido em front-end React e back-end Express. O back-end expoe 
 - `POST /api/titles/:id/payments`
 - `GET /api/dashboard`
 
+## Fluxo de Importacao
+
+O front-end envia arquivo por `multipart/form-data` para `POST /api/imports`. O back-end recebe via Multer, valida extensao, tamanho, conteudo vazio, cabecalho CSV e campos obrigatorios. Registros validos criam ou atualizam credores, devedores e protestos. Registros invalidos geram `ImportError` associados ao `ImportBatch`.
+
+Formatos aceitos na interface: CSV, TXT e JSON. O processamento operacional implementado para teste academico e CSV. Layout SIMPROT/CRA: (A DEFINIR).
+
 ## Banco de Dados
 
 Prisma gerencia enums, indices, relacionamentos e constraints. Supabase fornece PostgreSQL. `DATABASE_URL` usa pooler; `DIRECT_URL` usa conexao direta para migrations.

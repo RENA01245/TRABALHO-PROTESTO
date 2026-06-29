@@ -74,6 +74,8 @@ export const titleQuerySchema = z.object({
     name: z.string().optional(),
     status: z.enum(protestStatuses).optional(),
     date: z.coerce.date().optional(),
+    startDate: z.coerce.date().optional(),
+    endDate: z.coerce.date().optional(),
     page: z.coerce.number().int().positive().default(1),
     pageSize: z.coerce.number().int().positive().max(100).default(20)
   })

@@ -36,6 +36,42 @@ npx prisma db seed
 npm run dev
 ```
 
+## Teste de Importacao
+
+Use o arquivo de exemplo:
+
+```text
+backend/examples/protestos-exemplo.csv
+```
+
+Fluxo:
+
+1. Acesse `http://localhost:5173`.
+2. Entre com `admin@protesto.local` e `Admin@123456`.
+3. Abra `Importar Arquivo`.
+4. Selecione `backend/examples/protestos-exemplo.csv`.
+5. Clique em `Importar Arquivo`.
+6. Confira o resumo da importacao.
+7. Abra `Protestos` para consultar, filtrar e acessar detalhes.
+
+Formatos aceitos no upload de importacao: CSV, TXT e JSON. O processamento principal implementado e CSV; JSON e layout SIMPROT/CRA permanecem (A DEFINIR).
+
+## Boleto, Pagamento e Historico
+
+Na tela de detalhes do protesto e possivel:
+
+- alterar status e registrar pendencia por observacao;
+- anexar boleto em PDF ou imagem;
+- informar valor e vencimento do boleto;
+- registrar pagamento com valor, data, forma, status e observacao;
+- visualizar historico de importacao, status, boleto e pagamento.
+
+Arquivo de boleto para teste:
+
+```text
+backend/examples/boleto-exemplo.pdf
+```
+
 Frontend:
 
 ```bash

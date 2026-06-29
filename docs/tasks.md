@@ -119,6 +119,13 @@
 - Dependencias: T16.
 - Resultado esperado: URLs publicas.
 
+## T18 Verificacao Completa
+
+- Descricao: validar fluxo ponta a ponta apos melhoria de layout e upload.
+- Subtarefas: login, importacao CSV, listagem, filtros, detalhes, status, boleto, pagamento, historico, dashboard, relatorios, builds e audits.
+- Dependencias: T15, T16.
+- Resultado esperado: sistema pronto para apresentacao academica.
+
 ## Commits Sugeridos
 
 ```text
