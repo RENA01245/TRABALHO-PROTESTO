@@ -1,0 +1,40 @@
+openapi: 3.0.0
+info:
+  title: Sistema de Monitoramento de Protestos API
+  version: 1.0.0
+paths:
+  /api/auth/login:
+    post:
+      summary: Autentica usuario
+  /api/dashboard:
+    get:
+      summary: Retorna indicadores do dashboard
+  /api/imports:
+    get:
+      summary: Lista lotes de importacao
+    post:
+      summary: Importa arquivo CSV/TXT/JSON por multipart form-data
+  /api/titles:
+    get:
+      summary: Lista protestos com filtros
+    post:
+      summary: Cadastra protesto manual
+  /api/titles/{id}:
+    get:
+      summary: Retorna detalhes do protesto
+    put:
+      summary: Atualiza protesto
+    delete:
+      summary: Remove protesto
+  /api/titles/{id}/status:
+    patch:
+      summary: Altera status e registra historico
+  /api/titles/{id}/attachments:
+    post:
+      summary: Anexa boleto ou documento
+  /api/titles/{id}/payments:
+    post:
+      summary: Registra pagamento
+  /api/titles/{id}/receipt:
+    get:
+      summary: Gera comprovante PDF

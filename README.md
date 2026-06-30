@@ -2,6 +2,33 @@
 
 Projeto academico desenvolvido com Spec-Driven Development (SDD) seguindo o fluxo Constitution, Specify, Plan, Tasks e Implement.
 
+## Spec Kit Oficial
+
+Este repositorio tambem foi estruturado com o CLI oficial do GitHub Spec Kit (`specify`) a partir do pacote `github/spec-kit`.
+
+Evidencias no projeto:
+
+- `.specify/memory/constitution.md`
+- `.specify/templates/`
+- `.specify/scripts/`
+- `.codex/commands/speckit.*.md`
+- `specs/001-protest-monitoring/spec.md`
+- `specs/001-protest-monitoring/plan.md`
+- `specs/001-protest-monitoring/tasks.md`
+- `specs/001-protest-monitoring/research.md`
+- `specs/001-protest-monitoring/data-model.md`
+- `specs/001-protest-monitoring/quickstart.md`
+- `specs/001-protest-monitoring/contracts/openapi.yaml`
+
+Comandos oficiais usados:
+
+```bash
+uvx --from git+https://github.com/github/spec-kit.git specify check
+powershell -ExecutionPolicy Bypass -File .specify/scripts/powershell/create-new-feature.ps1 -Json -ShortName protest-monitoring "Sistema de Monitoramento de Protestos Importados por Arquivo"
+powershell -ExecutionPolicy Bypass -File .specify/scripts/powershell/setup-plan.ps1 -Json
+powershell -ExecutionPolicy Bypass -File .specify/scripts/powershell/setup-tasks.ps1 -Json
+```
+
 ## Objetivo
 
 O sistema simula a operacao de monitoramento de protestos importados por arquivo, permitindo autenticar usuarios, registrar lotes de importacao, auditar erros de arquivo, gerenciar credores, devedores e protestos, acompanhar pendencias de boleto e pagamento, alterar status, emitir protocolos, gerar comprovantes em PDF e consultar indicadores administrativos.
